@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+model Niche {
+  id          String    @id @default(uuid())
+  name        String
+  userId      String
+  numChannels Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  Channel     Channel[] @relation("NicheToChannel")
+  Job         Job[]     @relation("NicheToJob")
+}
+
+model Channel {
+  id               Int      @id @default(autoincrement())
+  name             String
+  link             String
+  number_of_videos Int
+  nicheId          String
+  niche            Niche    @relation("NicheToChannel", fields: [nicheId], references: [id])
+  subscribers      String
+  updatedAt        DateTime @updatedAt
+
+  @@index([nicheId])
+}
+
+model Job {
+  id         Int          @id @default(autoincrement())
+  nicheId    String
+  niche      Niche        @relation("NicheToJob", fields: [nicheId], references: [id])
+  channel1   String
+  channel2   String
+  channel3   String
+  channel4   String
+  channel5   String
+  status     String
+  createdAt  DateTime     @default(now())
+  userId     String
+  JobResults JobResults[] @relation("JobToResults")
+
+  @@index([nicheId])
+}
+
+model JobResults {
+  jobId    Int    @id
+  job      Job    @relation("JobToResults", fields: [jobId], references: [id])
+  channel1 String
+  channel2 String
+  channel3 String
+  channel4 String
+  channel5 String
+  userId   String
+
+  @@index([jobId])
+}
